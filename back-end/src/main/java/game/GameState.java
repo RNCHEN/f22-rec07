@@ -5,13 +5,16 @@ import java.util.Arrays;
 public class GameState {
 
     private final Cell[] cells;
-
+    private static Player winner;
+    private static Player currentPlayer;
     private GameState(Cell[] cells) {
         this.cells = cells;
     }
 
     public static GameState forGame(Game game) {
         Cell[] cells = getCells(game);
+        winner = game.getWinner();  // 获取 winner
+        currentPlayer = game.getPlayer();
         return new GameState(cells);
     }
 
@@ -26,8 +29,11 @@ public class GameState {
     @Override
     public String toString() {
         return """
-                { "cells": %s}
-                """.formatted(Arrays.toString(this.cells));
+                { "cells": %s,
+                  "winner": "%s",
+                  "currentPlayer": "%s"
+                }
+                """.formatted(Arrays.toString(this.cells),winner,currentPlayer);
     }
 
     private static Cell[] getCells(Game game) {
@@ -45,7 +51,7 @@ public class GameState {
                 else if (player == null) {
                     playable = true;
                 }
-                cells[3 * y + x] = new Cell(x, y, text, playable);
+                cells[3 * y + x] = new Cell(x, y, text, playable, game.getWinner());
             }
         }
         return cells;
@@ -57,12 +63,14 @@ class Cell {
     private final int y;
     private final String text;
     private final boolean playable;
+    private Player player;
 
-    Cell(int x, int y, String text, boolean playable) {
+    Cell(int x, int y, String text, boolean playable, Player player) {
         this.x = x;
         this.y = y;
         this.text = text;
         this.playable = playable;
+        this.player = player;
     }
 
     public int getX() {
